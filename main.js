@@ -155,12 +155,83 @@ function parseEmoji(element) {
 }
 
 // ==========================================
+// СЛАЙДЕР 
+// ==========================================
+function loadComparison() {
+    const grid = document.getElementById('comparisonGrid');
+    const data = typeof PORTFOLIO_VIDEOS !== 'undefined' ? PORTFOLIO_VIDEOS : {};
+    const pairs = data.comparison || [];
+    
+    if (!grid) return;
+    
+    if (pairs.length === 0) {
+        grid.innerHTML = `
+            <div class="comparison-empty">
+                🔄 Пока нет примеров До/После<br>
+            </div>
+        `;
+        return;
+    }
+    
+    grid.innerHTML = pairs.map((pair, idx) => `
+        <div class="comparison-item">
+            <div class="compare" data-compare="${idx}">
+                <video class="after" muted loop playsinline autoplay preload="auto">
+                    <source src="${pair.after}" type="video/mp4">
+                    <source src="${pair.after}" type="video/quicktime">
+                </video>
+                <video class="before" muted loop playsinline preload="metadata">
+                    <source src="${pair.before}" type="video/mp4">
+                    <source src="${pair.before}" type="video/quicktime">
+                </video>
+                <span class="label label-before">До</span>
+                <span class="label label-after">После</span>
+                <div class="handle"><div class="handle-circle">‹ ›</div></div>
+            </div>
+        </div>
+    `).join('');
+    
+    document.querySelectorAll('.compare').forEach(compare => {
+        const beforeVideo = compare.querySelector('.before');
+        const afterVideo = compare.querySelector('.after');
+        let dragging = false;
+        
+        afterVideo.addEventListener('play', () => {
+            beforeVideo.play().catch(() => {});
+        });
+        
+        function setPos(clientX) {
+            const rect = compare.getBoundingClientRect();
+            let p = ((clientX - rect.left) / rect.width) * 100;
+            p = Math.max(0, Math.min(100, p));
+            compare.style.setProperty('--pos', p + '%');
+        }
+        
+        compare.addEventListener('pointerdown', e => {
+            dragging = true;
+            compare.setPointerCapture(e.pointerId);
+            setPos(e.clientX);
+        });
+        compare.addEventListener('pointermove', e => {
+            if (dragging) setPos(e.clientX);
+        });
+        compare.addEventListener('pointerup', () => dragging = false);
+        compare.addEventListener('pointercancel', () => dragging = false);
+        
+        afterVideo.addEventListener('timeupdate', () => {
+            beforeVideo.currentTime = afterVideo.currentTime;
+        });
+    });
+    
+    parseEmoji();
+}
+
+// ==========================================
 // ПОРТФОЛИО
 // ==========================================
 function loadPortfolio() {
     const data = typeof PORTFOLIO_VIDEOS !== 'undefined' ? PORTFOLIO_VIDEOS : {};
-    
-    const categories = ['reels', 'expert', 'gaming'];
+    const categories = ['experts', 'motion', 'vlog', 'gaming'];
     
     categories.forEach(categoryKey => {
         const category = data[categoryKey];
@@ -214,7 +285,6 @@ function loadPortfolio() {
     
     parseEmoji();
 }
-
 // ==========================================
 // МОДАЛКА
 // ==========================================
@@ -225,6 +295,7 @@ const modalContent = modal.querySelector('.modal-content');
 
 function openModal(src, orientation = 'horizontal') {
     modalVideo.src = src;
+    modalVideo.muted = false;
     
     if (orientation === 'vertical') {
         modalContent.classList.add('vertical');
@@ -233,7 +304,6 @@ function openModal(src, orientation = 'horizontal') {
     }
     
     modal.classList.add('active');
-    modalVideo.play();
     document.body.style.overflow = 'hidden';
 }
 
@@ -249,7 +319,7 @@ modal.addEventListener('click', (e) => { if (e.target === modal) closeModal(); }
 document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
 
 // ==========================================
-// SCROLL АНИМАШКИ
+// SCROLL АНИМАЦИИ
 // ==========================================
 const observer = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
@@ -272,5 +342,6 @@ document.querySelectorAll('.section-header, .about-text, .principle, .contact-wr
 // ==========================================
 document.addEventListener('DOMContentLoaded', () => {
     loadPortfolio();
+    loadComparison();
     parseEmoji();
 });

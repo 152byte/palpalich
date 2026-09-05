@@ -2,22 +2,24 @@
 """
 Генерирует videos.js со списком видео по категориям.
 Структура папок:
-    videos/reels/    - обычные reels (вертикальные)
-    videos/expert/   - экспертные reels (вертикальные)
-    videos/gaming/   - игровые видео (горизонтальные)
+    videos/experts/      - экспертные (вертикальные)
+    videos/motion/       - моушн (вертикальные)
+    videos/vlog/         - влоги (горизонтальные)
+    videos/gaming/       - игровые (горизонтальные)
+    videos/comparison/   - пары "до/после"
 """
 import json
 from pathlib import Path
 
 VIDEOS_DIR = Path('videos')
 OUTPUT_FILE = Path('videos.js')
-ALLOWED_EXTENSIONS = {'.mp4', '.mov', '.webm', '.mkv', '.avi', '.m4v'}
+ALLOWED_EXTENSIONS = {'.mp4', '.mov', '.webm', '.mkv', '.avi', '.m4v', '.gif'}
 
-# Категории: (имя папки, отображаемое название, ориентация)
 CATEGORIES = [
-    ('reels', 'Reels', 'vertical'),
-    ('expert', 'Экспертные Reels', 'vertical'),
-    ('gaming', 'Игровые', 'horizontal'),
+    ('experts', 'Experts', 'vertical'),
+    ('motion', 'Motion', 'vertical'),
+    ('vlog', 'Vlog', 'horizontal'),
+    ('gaming', 'Gaming', 'horizontal'),
 ]
 
 def format_name(filename):
@@ -28,7 +30,6 @@ def format_name(filename):
     return name.strip() or Path(filename).stem
 
 def scan_category(folder_name):
-    """Сканирует одну подпапку и возвращает список видео"""
     folder = VIDEOS_DIR / folder_name
     if not folder.exists():
         return []
@@ -42,6 +43,34 @@ def scan_category(folder_name):
                 'filename': file.name,
             })
     return videos
+
+def scan_comparison():
+    folder = VIDEOS_DIR / 'comparison'
+    if not folder.exists():
+        return []
+    
+    files = {}
+    for file in folder.iterdir():
+        if not file.is_file() or file.suffix.lower() not in ALLOWED_EXTENSIONS:
+            continue
+        
+        stem = file.stem
+        if stem.endswith('_before'):
+            base_name = stem[:-7]
+            files.setdefault(base_name, {})['before'] = file
+        elif stem.endswith('_after'):
+            base_name = stem[:-6]
+            files.setdefault(base_name, {})['after'] = file
+    
+    pairs = []
+    for base_name, pair in sorted(files.items(), reverse=True):
+        if 'before' in pair and 'after' in pair:
+            pairs.append({
+                'name': base_name.replace('_', ' ').replace('-', ' ').title(),
+                'before': f'videos/comparison/{pair["before"].name}',
+                'after': f'videos/comparison/{pair["after"].name}',
+            })
+    return pairs
 
 def main():
     print('🎬 Сканирование папки videos/...')
@@ -59,15 +88,18 @@ def main():
         total += len(videos)
         print(f'   📁 {display_name}: {len(videos)} видео')
     
+    comparison = scan_comparison()
+    result['comparison'] = comparison
+    print(f'   🔄 До/После: {len(comparison)} пар')
     
-    js_content = f'// Сгенерировано автоматически скриптом update_videos.py\nconst PORTFOLIO_VIDEOS = {json.dumps(result, ensure_ascii=False, indent=2)};\n'
+    js_content = f'// Сгенерировано автоматически\nconst PORTFOLIO_VIDEOS = {json.dumps(result, ensure_ascii=False, indent=2)};\n'
     
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
         f.write(js_content)
     
     print(f'\n✅ Всего видео: {total}')
     print(f'💾 Обновлено: {OUTPUT_FILE}')
-    print('\n🚀 Теперь можно коммитить!')
+    print('\n🚀 Можно коммитить!')
 
 if __name__ == '__main__':
     main()

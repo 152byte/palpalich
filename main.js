@@ -1,5 +1,5 @@
 // ==========================================
-// МОДАЛКА ВЫБОРА ЯЗЫКА
+// МОДАЛКА ВЫБОРА ЯЗЫКА 
 // ==========================================
 (function initLangModal() {
     const modal = document.getElementById('langModal');
@@ -13,23 +13,13 @@
         modal.style.display = 'none';
         return;
     }
-    
+
     document.body.classList.add('lang-modal-open');
     
     const buttons = modal.querySelectorAll('.lang-btn');
-    
-    const autoCloseTimer = setTimeout(() => {
-        if (!modal.classList.contains('hidden')) {
-            localStorage.setItem('preferred_lang', 'ru');
-            applyLanguage('ru');
-            updateSwitcherUI('ru');
-            closeLangModal();
-        }
-    }, 5000);
-    
+
     buttons.forEach(btn => {
         btn.addEventListener('click', () => {
-            clearTimeout(autoCloseTimer);
             const lang = btn.dataset.lang;
             localStorage.setItem('preferred_lang', lang);
             applyLanguage(lang);
@@ -37,10 +27,9 @@
             closeLangModal();
         });
     });
-    
+
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-            clearTimeout(autoCloseTimer);
             localStorage.setItem('preferred_lang', 'ru');
             applyLanguage('ru');
             updateSwitcherUI('ru');

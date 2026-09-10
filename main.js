@@ -1,4 +1,118 @@
 // ==========================================
+// МОДАЛКА ВЫБОРА ЯЗЫКА
+// ==========================================
+(function initLangModal() {
+    const modal = document.getElementById('langModal');
+    if (!modal) return;
+    
+    const savedLang = localStorage.getItem('preferred_lang');
+    
+    if (savedLang) {
+        applyLanguage(savedLang);
+        updateSwitcherUI(savedLang);
+        modal.style.display = 'none';
+        return;
+    }
+    
+    document.body.classList.add('lang-modal-open');
+    
+    const buttons = modal.querySelectorAll('.lang-btn');
+    
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const lang = btn.dataset.lang;
+            localStorage.setItem('preferred_lang', lang);
+            applyLanguage(lang);
+            updateSwitcherUI(lang);
+            closeLangModal();
+        });
+    });
+    
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+            localStorage.setItem('preferred_lang', 'ru');
+            applyLanguage('ru');
+            updateSwitcherUI('ru');
+            closeLangModal();
+        }
+    });
+    
+    function closeLangModal() {
+        document.body.classList.remove('lang-modal-open');
+        modal.classList.add('hidden');
+        setTimeout(() => {
+            modal.style.display = 'none';
+        }, 500);
+    }
+})();
+
+// ==========================================
+// ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА В НАВИГАЦИИ
+// ==========================================
+(function initLangSwitcher() {
+    const buttons = document.querySelectorAll('.lang-switch-btn');
+    
+    buttons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const lang = btn.dataset.lang;
+            localStorage.setItem('preferred_lang', lang);
+            applyLanguage(lang);
+            updateSwitcherUI(lang);
+        });
+    });
+})();
+
+function updateSwitcherUI(lang) {
+    document.querySelectorAll('.lang-switch-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+    });
+}
+
+// ==========================================
+// ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА
+// ==========================================
+function applyLanguage(lang) {
+    const elements = document.querySelectorAll('[data-ru][data-en]');
+    elements.forEach(el => {
+        const text = el.getAttribute(`data-${lang}`);
+        if (text !== null) {
+            if (el.querySelector('strong')) {
+                const strong = el.querySelector('strong').outerHTML;
+                const parts = text.split('2023');
+                if (parts.length === 2) {
+                    el.innerHTML = parts[0] + strong + parts[1];
+                }
+            } 
+            else if (el.children.length === 0) {
+                el.textContent = text;
+            }
+
+        }
+    });
+    
+    document.documentElement.lang = lang;
+
+    document.title = lang === 'ru' 
+        ? 'Пал Палыч | Съемка, монтаж видео'
+        : 'Pal Palych | Video shooting and editing';
+
+    document.querySelectorAll('.label-before').forEach(el => {
+        el.textContent = lang === 'ru' ? 'До' : 'Before';
+    });
+    document.querySelectorAll('.label-after').forEach(el => {
+        el.textContent = lang === 'ru' ? 'После' : 'After';
+    });
+
+    document.querySelectorAll('.category-count').forEach(el => {
+        const text = el.textContent;
+        const num = text.match(/\d+/);
+        if (num) {
+            el.textContent = lang === 'ru' ? `${num[0]} видео` : `${num[0]} videos`;
+        }
+    });
+}
+
+// ==========================================
 // АНИМИРОВАННЫЙ ФОН
 // ==========================================
 const canvas = document.getElementById('bgCanvas');
@@ -8,8 +122,8 @@ let particles = [];
 let mouse = { x: null, y: null, radius: 150 };
 
 const config = {
-    particleCount: 300,
-    particleColor: 'rgba(255, 60, 60, 0.5)',
+    particleCount: 800,
+    particleColor: 'rgba(255, 60, 60, 0.6)',
     lineColor: '255, 60, 60',
     maxDistance: 120,
     speed: 0.3
@@ -24,10 +138,10 @@ class Particle {
     constructor() {
         this.x = Math.random() * canvas.width;
         this.y = Math.random() * canvas.height;
-        this.size = Math.random() * 2 + 1;
+        this.size = Math.random() * 3 + 2;
         this.speedX = (Math.random() - 0.5) * config.speed;
         this.speedY = (Math.random() - 0.5) * config.speed;
-        this.opacity = Math.random() * 0.5 + 0.2;
+        this.opacity = Math.random() * 0.5 + 0.3;
     }
 
     update() {
@@ -63,7 +177,7 @@ class Particle {
 
 function initParticles() {
     particles = [];
-    const count = Math.min(config.particleCount, Math.floor((canvas.width * canvas.height) / 15000));
+    const count = Math.min(config.particleCount, Math.floor((canvas.width * canvas.height) / 4000));
     for (let i = 0; i < count; i++) {
         particles.push(new Particle());
     }
@@ -155,7 +269,7 @@ function parseEmoji(element) {
 }
 
 // ==========================================
-// СЛАЙДЕР 
+// СЛАЙДЕР ДО/ПОСЛЕ
 // ==========================================
 function loadComparison() {
     const grid = document.getElementById('comparisonGrid');
@@ -165,24 +279,19 @@ function loadComparison() {
     if (!grid) return;
     
     if (pairs.length === 0) {
-        grid.innerHTML = `
-            <div class="comparison-empty">
-                🔄 Пока нет примеров До/После<br>
-            </div>
-        `;
+        grid.innerHTML = `<div class="comparison-empty">🔄</div>`;
         return;
     }
     
     grid.innerHTML = pairs.map((pair, idx) => `
         <div class="comparison-item">
+            <div class="comparison-title">${pair.name}</div>
             <div class="compare" data-compare="${idx}">
                 <video class="after" muted loop playsinline autoplay preload="auto">
                     <source src="${pair.after}" type="video/mp4">
-                    <source src="${pair.after}" type="video/quicktime">
                 </video>
-                <video class="before" muted loop playsinline preload="metadata">
+                <video class="before" muted loop playsinline autoplay preload="auto">
                     <source src="${pair.before}" type="video/mp4">
-                    <source src="${pair.before}" type="video/quicktime">
                 </video>
                 <span class="label label-before">До</span>
                 <span class="label label-after">После</span>
@@ -191,14 +300,33 @@ function loadComparison() {
         </div>
     `).join('');
     
+    const currentLang = localStorage.getItem('preferred_lang') || 'ru';
+    if (currentLang === 'en') {
+        document.querySelectorAll('.label-before').forEach(el => el.textContent = 'Before');
+        document.querySelectorAll('.label-after').forEach(el => el.textContent = 'After');
+    }
+    
     document.querySelectorAll('.compare').forEach(compare => {
         const beforeVideo = compare.querySelector('.before');
         const afterVideo = compare.querySelector('.after');
         let dragging = false;
         
-        afterVideo.addEventListener('play', () => {
+        function playBoth() {
             beforeVideo.play().catch(() => {});
-        });
+            afterVideo.play().catch(() => {});
+        }
+        
+        afterVideo.addEventListener('canplay', playBoth, { once: true });
+        beforeVideo.addEventListener('canplay', playBoth, { once: true });
+        
+        setInterval(() => {
+            if (!beforeVideo.paused && !afterVideo.paused) {
+                const diff = Math.abs(beforeVideo.currentTime - afterVideo.currentTime);
+                if (diff > 0.5) {
+                    beforeVideo.currentTime = afterVideo.currentTime;
+                }
+            }
+        }, 1000);
         
         function setPos(clientX) {
             const rect = compare.getBoundingClientRect();
@@ -208,6 +336,7 @@ function loadComparison() {
         }
         
         compare.addEventListener('pointerdown', e => {
+            playBoth();
             dragging = true;
             compare.setPointerCapture(e.pointerId);
             setPos(e.clientX);
@@ -217,10 +346,6 @@ function loadComparison() {
         });
         compare.addEventListener('pointerup', () => dragging = false);
         compare.addEventListener('pointercancel', () => dragging = false);
-        
-        afterVideo.addEventListener('timeupdate', () => {
-            beforeVideo.currentTime = afterVideo.currentTime;
-        });
     });
     
     parseEmoji();
@@ -283,10 +408,21 @@ function loadPortfolio() {
         });
     });
     
+    const currentLang = localStorage.getItem('preferred_lang') || 'ru';
+    if (currentLang === 'en') {
+        document.querySelectorAll('.category-count').forEach(el => {
+            const text = el.textContent;
+            if (text.includes('видео')) {
+                el.textContent = text.replace('видео', 'videos');
+            }
+        });
+    }
+    
     parseEmoji();
 }
+
 // ==========================================
-// МОДАЛКА
+// МОДАЛКА ВИДЕО
 // ==========================================
 const modal = document.getElementById('videoModal');
 const modalVideo = modal.querySelector('.modal-video');
@@ -330,7 +466,7 @@ const observer = new IntersectionObserver((entries) => {
     });
 }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
 
-document.querySelectorAll('.section-header, .about-text, .principle, .contact-wrapper, .portfolio-category').forEach(el => {
+document.querySelectorAll('.section-header, .about-text, .principle, .contact-wrapper, .portfolio-category, .comparison-block').forEach(el => {
     el.style.opacity = '0';
     el.style.transform = 'translateY(30px)';
     el.style.transition = 'opacity 0.8s ease-out, transform 0.8s ease-out';

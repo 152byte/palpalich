@@ -18,8 +18,18 @@
     
     const buttons = modal.querySelectorAll('.lang-btn');
     
+    const autoCloseTimer = setTimeout(() => {
+        if (!modal.classList.contains('hidden')) {
+            localStorage.setItem('preferred_lang', 'ru');
+            applyLanguage('ru');
+            updateSwitcherUI('ru');
+            closeLangModal();
+        }
+    }, 5000);
+    
     buttons.forEach(btn => {
         btn.addEventListener('click', () => {
+            clearTimeout(autoCloseTimer);
             const lang = btn.dataset.lang;
             localStorage.setItem('preferred_lang', lang);
             applyLanguage(lang);
@@ -30,6 +40,7 @@
     
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
+            clearTimeout(autoCloseTimer);
             localStorage.setItem('preferred_lang', 'ru');
             applyLanguage('ru');
             updateSwitcherUI('ru');
@@ -47,7 +58,7 @@
 })();
 
 // ==========================================
-// ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА В НАВИГАЦИИ
+// ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА
 // ==========================================
 (function initLangSwitcher() {
     const buttons = document.querySelectorAll('.lang-switch-btn');
@@ -68,9 +79,6 @@ function updateSwitcherUI(lang) {
     });
 }
 
-// ==========================================
-// ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА
-// ==========================================
 function applyLanguage(lang) {
     const elements = document.querySelectorAll('[data-ru][data-en]');
     elements.forEach(el => {
@@ -86,7 +94,6 @@ function applyLanguage(lang) {
             else if (el.children.length === 0) {
                 el.textContent = text;
             }
-
         }
     });
     
@@ -113,7 +120,7 @@ function applyLanguage(lang) {
 }
 
 // ==========================================
-// АНИМИРОВАННЫЙ ФОН
+// АНИМИРОВАННЫЙ ФОН (оптимизированный)
 // ==========================================
 const canvas = document.getElementById('bgCanvas');
 const ctx = canvas.getContext('2d');
@@ -122,10 +129,10 @@ let particles = [];
 let mouse = { x: null, y: null, radius: 150 };
 
 const config = {
-    particleCount: 800,
+    particleCount: 250,          // ← оптимизировано: было 800
     particleColor: 'rgba(255, 60, 60, 0.6)',
     lineColor: '255, 60, 60',
-    maxDistance: 120,
+    maxDistance: 110,
     speed: 0.3
 };
 
@@ -177,7 +184,7 @@ class Particle {
 
 function initParticles() {
     particles = [];
-    const count = Math.min(config.particleCount, Math.floor((canvas.width * canvas.height) / 4000));
+    const count = Math.min(config.particleCount, Math.floor((canvas.width * canvas.height) / 8000));
     for (let i = 0; i < count; i++) {
         particles.push(new Particle());
     }
@@ -269,7 +276,7 @@ function parseEmoji(element) {
 }
 
 // ==========================================
-// СЛАЙДЕР ДО/ПОСЛЕ
+// СЛАЙДЕР ДО/ПОСЛЕ (оптимизированный — без лагов)
 // ==========================================
 function loadComparison() {
     const grid = document.getElementById('comparisonGrid');
@@ -283,14 +290,15 @@ function loadComparison() {
         return;
     }
     
+    // ✅ preload="metadata" для after, "none" для before (экономия трафика)
     grid.innerHTML = pairs.map((pair, idx) => `
         <div class="comparison-item">
             <div class="comparison-title">${pair.name}</div>
             <div class="compare" data-compare="${idx}">
-                <video class="after" muted loop playsinline autoplay preload="auto">
+                <video class="after" muted loop playsinline preload="metadata">
                     <source src="${pair.after}" type="video/mp4">
                 </video>
-                <video class="before" muted loop playsinline autoplay preload="auto">
+                <video class="before" muted loop playsinline preload="none">
                     <source src="${pair.before}" type="video/mp4">
                 </video>
                 <span class="label label-before">До</span>
@@ -310,23 +318,40 @@ function loadComparison() {
         const beforeVideo = compare.querySelector('.before');
         const afterVideo = compare.querySelector('.after');
         let dragging = false;
+        let isVisible = false;
         
         function playBoth() {
-            beforeVideo.play().catch(() => {});
             afterVideo.play().catch(() => {});
+            beforeVideo.play().catch(() => {});
+        }
+        function pauseBoth() {
+            afterVideo.pause();
+            beforeVideo.pause();
         }
         
-        afterVideo.addEventListener('canplay', playBoth, { once: true });
-        beforeVideo.addEventListener('canplay', playBoth, { once: true });
-        
-        setInterval(() => {
-            if (!beforeVideo.paused && !afterVideo.paused) {
-                const diff = Math.abs(beforeVideo.currentTime - afterVideo.currentTime);
-                if (diff > 0.5) {
-                    beforeVideo.currentTime = afterVideo.currentTime;
+        // ✅ IntersectionObserver: играем ТОЛЬКО когда слайдер виден
+        const io = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                isVisible = entry.isIntersecting;
+                if (isVisible) {
+                    playBoth();
+                } else {
+                    pauseBoth();
                 }
+            });
+        }, { threshold: 0.2 });
+        io.observe(compare);
+        
+        // ✅ Синхронизация через playbackRate (плавно, без seek-лагов)
+        setInterval(() => {
+            if (!isVisible) return;
+            if (beforeVideo.paused || afterVideo.paused) return;
+            const diff = afterVideo.currentTime - beforeVideo.currentTime;
+            if (Math.abs(diff) > 0.4) {
+                beforeVideo.playbackRate = diff > 0 ? 1.15 : 0.9;
+                setTimeout(() => { beforeVideo.playbackRate = 1; }, 600);
             }
-        }, 1000);
+        }, 1500);
         
         function setPos(clientX) {
             const rect = compare.getBoundingClientRect();

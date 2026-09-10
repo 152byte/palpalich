@@ -34,16 +34,47 @@ def scan_category(folder_name):
     if not folder.exists():
         return []
     
-    videos = []
-    for file in sorted(folder.iterdir(), reverse=True):
+    # ✅ ПРИОРИТЕТНЫЕ ФАЙЛЫ для каждой категории
+    priority_files = {
+        'experts': ['Апартаменты', 'Метрики'],
+        'motion': [],
+        'vlog': [],
+        'gaming': [],
+    }
+    
+    all_videos = []
+    for file in folder.iterdir():
         if file.is_file() and file.suffix.lower() in ALLOWED_EXTENSIONS:
-            videos.append({
+            all_videos.append({
                 'name': format_name(file.name),
                 'src': f'videos/{folder_name}/{file.name}',
                 'filename': file.name,
+                'stem': file.stem, 
             })
+    
+    priorities = priority_files.get(folder_name, [])
+    
+    if priorities:
+        priority_videos = []
+        other_videos = []
+        
+        for video in all_videos:
+            if video['stem'] in priorities:
+                priority_videos.append(video)
+            else:
+                other_videos.append(video)
+        
+        priority_videos.sort(key=lambda v: priorities.index(v['stem']))
+        other_videos.sort(key=lambda v: v['stem'], reverse=True)
+        
+        videos = priority_videos + other_videos
+    else:
+        videos = sorted(all_videos, key=lambda v: v['stem'], reverse=True)
+    
+    for v in videos:
+        v.pop('stem', None)
+    
     return videos
-
 def scan_comparison():
     folder = VIDEOS_DIR / 'comparison'
     if not folder.exists():

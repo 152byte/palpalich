@@ -5,6 +5,7 @@
     videos/experts/      - экспертные (вертикальные)
     videos/motion/       - моушн (вертикальные)
     videos/vlog/         - влоги (горизонтальные)
+    videos/travel/       - путешествия (вертикальные)
     videos/gaming/       - игровые (горизонтальные)
     videos/comparison/   - пары "до/после"
 """
@@ -19,6 +20,7 @@ CATEGORIES = [
     ('experts', 'Experts', 'vertical'),
     ('motion', 'Motion', 'vertical'),
     ('vlog', 'Vlog', 'horizontal'),
+    ('travel', 'Travel', 'vertical'),  
     ('gaming', 'Gaming', 'horizontal'),
 ]
 
@@ -33,12 +35,12 @@ def scan_category(folder_name):
     folder = VIDEOS_DIR / folder_name
     if not folder.exists():
         return []
-    
-    # ✅ ПРИОРИТЕТНЫЕ ФАЙЛЫ для каждой категории
+
     priority_files = {
-        'experts': ['Апартаменты', 'Метрики'],
-        'motion': [],
+        'experts': ['Майк', 'Mike', 'mike', 'Метрики', 'Апартаменты', 'Статистика', 'Отопление'],
+        'motion': ['Авто', 'Блокчейн'],
         'vlog': [],
+        'travel': ['Вьетнам', 'Vietnam', 'vietnam'],
         'gaming': [],
     }
     
@@ -49,24 +51,23 @@ def scan_category(folder_name):
                 'name': format_name(file.name),
                 'src': f'videos/{folder_name}/{file.name}',
                 'filename': file.name,
-                'stem': file.stem, 
+                'stem': file.stem,
             })
     
     priorities = priority_files.get(folder_name, [])
+    prio_lower = [p.lower() for p in priorities]
     
     if priorities:
         priority_videos = []
         other_videos = []
-        
         for video in all_videos:
-            if video['stem'] in priorities:
+            if video['stem'].lower() in prio_lower:
                 priority_videos.append(video)
             else:
                 other_videos.append(video)
-        
-        priority_videos.sort(key=lambda v: priorities.index(v['stem']))
+
+        priority_videos.sort(key=lambda v: prio_lower.index(v['stem'].lower()))
         other_videos.sort(key=lambda v: v['stem'], reverse=True)
-        
         videos = priority_videos + other_videos
     else:
         videos = sorted(all_videos, key=lambda v: v['stem'], reverse=True)
@@ -75,6 +76,7 @@ def scan_category(folder_name):
         v.pop('stem', None)
     
     return videos
+
 def scan_comparison():
     folder = VIDEOS_DIR / 'comparison'
     if not folder.exists():
@@ -117,20 +119,20 @@ def main():
             'videos': videos
         }
         total += len(videos)
-        print(f'   📁 {display_name}: {len(videos)} видео')
+        print(f'{display_name}: {len(videos)} видео')
     
     comparison = scan_comparison()
     result['comparison'] = comparison
-    print(f'   🔄 До/После: {len(comparison)} пар')
+    print(f'До/После: {len(comparison)} пар')
     
-    js_content = f'// Сгенерировано автоматически\nconst PORTFOLIO_VIDEOS = {json.dumps(result, ensure_ascii=False, indent=2)};\n'
+    js_content = f'\nconst PORTFOLIO_VIDEOS = {json.dumps(result, ensure_ascii=False, indent=2)};\n'
     
     with open(OUTPUT_FILE, 'w', encoding='utf-8') as f:
         f.write(js_content)
     
-    print(f'\n✅ Всего видео: {total}')
-    print(f'💾 Обновлено: {OUTPUT_FILE}')
-    print('\n🚀 Можно коммитить!')
+    print(f'\nВсего видео: {total}')
+    print(f'Обновлено: {OUTPUT_FILE}')
+
 
 if __name__ == '__main__':
     main()

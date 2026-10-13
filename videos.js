@@ -1,18 +1,23 @@
-// Сгенерировано автоматически
+
 const PORTFOLIO_VIDEOS = {
   "experts": {
     "title": "Experts",
     "orientation": "vertical",
     "videos": [
       {
-        "name": "Апартаменты",
-        "src": "videos/experts/Апартаменты.mp4",
-        "filename": "Апартаменты.mp4"
+        "name": "Mike",
+        "src": "videos/experts/Mike.mp4",
+        "filename": "Mike.mp4"
       },
       {
         "name": "Метрики",
         "src": "videos/experts/Метрики.mp4",
         "filename": "Метрики.mp4"
+      },
+      {
+        "name": "Апартаменты",
+        "src": "videos/experts/Апартаменты.mp4",
+        "filename": "Апартаменты.mp4"
       },
       {
         "name": "Статистика",
@@ -31,6 +36,16 @@ const PORTFOLIO_VIDEOS = {
     "orientation": "vertical",
     "videos": [
       {
+        "name": "Авто",
+        "src": "videos/motion/Авто.mp4",
+        "filename": "Авто.mp4"
+      },
+      {
+        "name": "Блокчейн",
+        "src": "videos/motion/Блокчейн.mp4",
+        "filename": "Блокчейн.mp4"
+      },
+      {
         "name": "Мерс",
         "src": "videos/motion/Мерс.mp4",
         "filename": "Мерс.mp4"
@@ -39,16 +54,6 @@ const PORTFOLIO_VIDEOS = {
         "name": "Любовь",
         "src": "videos/motion/Любовь.mp4",
         "filename": "Любовь.mp4"
-      },
-      {
-        "name": "Блокчейн",
-        "src": "videos/motion/Блокчейн.mp4",
-        "filename": "Блокчейн.mp4"
-      },
-      {
-        "name": "Авто",
-        "src": "videos/motion/Авто.mp4",
-        "filename": "Авто.mp4"
       }
     ]
   },
@@ -68,6 +73,17 @@ const PORTFOLIO_VIDEOS = {
       }
     ]
   },
+  "travel": {
+    "title": "Travel",
+    "orientation": "vertical",
+    "videos": [
+      {
+        "name": "Vietnam",
+        "src": "videos/travel/Vietnam.mp4",
+        "filename": "Vietnam.mp4"
+      }
+    ]
+  },
   "gaming": {
     "title": "Gaming",
     "orientation": "horizontal",
@@ -82,13 +98,13 @@ const PORTFOLIO_VIDEOS = {
   "comparison": [
     {
       "name": "Метрики",
-      "before": "videos/comparison/Метрики_before.mp4",
-      "after": "videos/comparison/Метрики_after.mp4"
+      "before": "videos/comparison/Метрики_before.mov",
+      "after": "videos/comparison/Метрики_after.mov"
     },
     {
-      "name": "Апартаменты",
-      "before": "videos/comparison/Апартаменты_before.mp4",
-      "after": "videos/comparison/Апартаменты_after.mp4"
+      "name": "Аппартаменты",
+      "before": "videos/comparison/Аппартаменты_before.mov",
+      "after": "videos/comparison/Аппартаменты_after.mp4"
     }
   ]
 };

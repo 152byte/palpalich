@@ -1,36 +1,31 @@
 // ==========================================
+// ТЕКУЩИЙ ЯЗЫК
+// ==========================================
+let currentLang = 'ru';
+
+// ==========================================
 // МОДАЛКА ВЫБОРА ЯЗЫКА 
 // ==========================================
 (function initLangModal() {
     const modal = document.getElementById('langModal');
     if (!modal) return;
     
-    const savedLang = localStorage.getItem('preferred_lang');
-    
-    if (savedLang) {
-        applyLanguage(savedLang);
-        updateSwitcherUI(savedLang);
-        modal.style.display = 'none';
-        return;
-    }
-
     document.body.classList.add('lang-modal-open');
     
     const buttons = modal.querySelectorAll('.lang-btn');
-
+    
     buttons.forEach(btn => {
         btn.addEventListener('click', () => {
-            const lang = btn.dataset.lang;
-            localStorage.setItem('preferred_lang', lang);
-            applyLanguage(lang);
-            updateSwitcherUI(lang);
+            currentLang = btn.dataset.lang;
+            applyLanguage(currentLang);
+            updateSwitcherUI(currentLang);
             closeLangModal();
         });
     });
-
+    
     document.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
-            localStorage.setItem('preferred_lang', 'ru');
+            currentLang = 'ru';
             applyLanguage('ru');
             updateSwitcherUI('ru');
             closeLangModal();
@@ -47,17 +42,16 @@
 })();
 
 // ==========================================
-// ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА
+// ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА В НАВИГАЦИИ
 // ==========================================
 (function initLangSwitcher() {
     const buttons = document.querySelectorAll('.lang-switch-btn');
     
     buttons.forEach(btn => {
         btn.addEventListener('click', () => {
-            const lang = btn.dataset.lang;
-            localStorage.setItem('preferred_lang', lang);
-            applyLanguage(lang);
-            updateSwitcherUI(lang);
+            currentLang = btn.dataset.lang;
+            applyLanguage(currentLang);
+            updateSwitcherUI(currentLang);
         });
     });
 })();
@@ -68,6 +62,9 @@ function updateSwitcherUI(lang) {
     });
 }
 
+// ==========================================
+// ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА
+// ==========================================
 function applyLanguage(lang) {
     const elements = document.querySelectorAll('[data-ru][data-en]');
     elements.forEach(el => {
@@ -109,7 +106,7 @@ function applyLanguage(lang) {
 }
 
 // ==========================================
-// АНИМИРОВАННЫЙ ФОН (оптимизированный)
+// АНИМИРОВАННЫЙ ФОН
 // ==========================================
 const canvas = document.getElementById('bgCanvas');
 const ctx = canvas.getContext('2d');
@@ -118,7 +115,7 @@ let particles = [];
 let mouse = { x: null, y: null, radius: 150 };
 
 const config = {
-    particleCount: 250,          // ← оптимизировано: было 800
+    particleCount: 250,
     particleColor: 'rgba(255, 60, 60, 0.6)',
     lineColor: '255, 60, 60',
     maxDistance: 110,
@@ -255,9 +252,6 @@ window.addEventListener('scroll', () => {
         : 'rgba(10, 10, 10, 0.6)';
 });
 
-// ==========================================
-// ЭМОДЗИ
-// ==========================================
 function parseEmoji(element) {
     if (typeof twemoji !== 'undefined') {
         twemoji.parse(element || document.body);
@@ -265,7 +259,7 @@ function parseEmoji(element) {
 }
 
 // ==========================================
-// СЛАЙДЕР ДО/ПОСЛЕ (оптимизированный — без лагов)
+// СЛАЙДЕР ДО/ПОСЛЕ 
 // ==========================================
 function loadComparison() {
     const grid = document.getElementById('comparisonGrid');
@@ -278,11 +272,9 @@ function loadComparison() {
         grid.innerHTML = `<div class="comparison-empty">🔄</div>`;
         return;
     }
-    
-    // ✅ preload="metadata" для after, "none" для before (экономия трафика)
+
     grid.innerHTML = pairs.map((pair, idx) => `
         <div class="comparison-item">
-            <div class="comparison-title">${pair.name}</div>
             <div class="compare" data-compare="${idx}">
                 <video class="after" muted loop playsinline preload="metadata">
                     <source src="${pair.after}" type="video/mp4">
@@ -297,7 +289,6 @@ function loadComparison() {
         </div>
     `).join('');
     
-    const currentLang = localStorage.getItem('preferred_lang') || 'ru';
     if (currentLang === 'en') {
         document.querySelectorAll('.label-before').forEach(el => el.textContent = 'Before');
         document.querySelectorAll('.label-after').forEach(el => el.textContent = 'After');
@@ -318,7 +309,6 @@ function loadComparison() {
             beforeVideo.pause();
         }
         
-        // ✅ IntersectionObserver: играем ТОЛЬКО когда слайдер виден
         const io = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 isVisible = entry.isIntersecting;
@@ -331,7 +321,6 @@ function loadComparison() {
         }, { threshold: 0.2 });
         io.observe(compare);
         
-        // ✅ Синхронизация через playbackRate (плавно, без seek-лагов)
         setInterval(() => {
             if (!isVisible) return;
             if (beforeVideo.paused || afterVideo.paused) return;
@@ -366,11 +355,11 @@ function loadComparison() {
 }
 
 // ==========================================
-// ПОРТФОЛИО
+// ПОРТФОЛИО 
 // ==========================================
 function loadPortfolio() {
     const data = typeof PORTFOLIO_VIDEOS !== 'undefined' ? PORTFOLIO_VIDEOS : {};
-    const categories = ['experts', 'motion', 'vlog', 'gaming'];
+    const categories = ['experts', 'motion', 'vlog', 'travel', 'gaming']; 
     
     categories.forEach(categoryKey => {
         const category = data[categoryKey];
@@ -404,7 +393,6 @@ function loadPortfolio() {
                 <div class="${isVertical ? 'reel-card-overlay' : 'gaming-card-overlay'}">
                     <div class="${isVertical ? 'reel-play' : 'gaming-play'}">▶</div>
                 </div>
-                <div class="${isVertical ? 'reel-name' : 'gaming-name'}">${video.name}</div>
             </div>
         `).join('');
         
@@ -422,7 +410,6 @@ function loadPortfolio() {
         });
     });
     
-    const currentLang = localStorage.getItem('preferred_lang') || 'ru';
     if (currentLang === 'en') {
         document.querySelectorAll('.category-count').forEach(el => {
             const text = el.textContent;

@@ -15,9 +15,9 @@ const PORTFOLIO_VIDEOS = {
         "filename": "Метрики.mp4"
       },
       {
-        "name": "Апартаменты",
-        "src": "videos/experts/Апартаменты.mp4",
-        "filename": "Апартаменты.mp4"
+        "name": "Аппартаменты",
+        "src": "videos/experts/Аппартаменты.mp4",
+        "filename": "Аппартаменты.mp4"
       },
       {
         "name": "Статистика",

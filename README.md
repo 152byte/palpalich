@@ -23,7 +23,6 @@
 * **Frontend:** HTML5, CSS3 (Flexbox, Grid, CSS Variables), Vanilla JavaScript (ES6+)
 * **Графика:** HTML5 Canvas API (для фона), SVG (иконки)
 * **Backend/Утилиты:** Python 3 (для генерации JSON-списка видео)
-* **Обработка видео:** FFmpeg (сжатие и конвертация)
 * **Хостинг:** GitHub Pages
 
 ---

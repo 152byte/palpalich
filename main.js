@@ -442,6 +442,7 @@ function openModal(src, orientation = 'horizontal') {
     
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
+    document.body.classList.add('modal-video-open');
 }
 
 function closeModal() {
@@ -449,6 +450,7 @@ function closeModal() {
     modalVideo.pause();
     modalVideo.src = '';
     document.body.style.overflow = '';
+    document.body.classList.remove('modal-video-open');
 }
 
 modalClose.addEventListener('click', closeModal);

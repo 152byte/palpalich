@@ -97,6 +97,11 @@ const PORTFOLIO_VIDEOS = {
   },
   "comparison": [
     {
+      "name": "Mike",
+      "before": "videos/comparison/Mike_before.mp4",
+      "after": "videos/comparison/Mike_after.mp4"
+    },
+    {
       "name": "Метрики",
       "before": "videos/comparison/Метрики_before.mov",
       "after": "videos/comparison/Метрики_after.mov"
@@ -105,11 +110,6 @@ const PORTFOLIO_VIDEOS = {
       "name": "Аппартаменты",
       "before": "videos/comparison/Аппартаменты_before.mov",
       "after": "videos/comparison/Аппартаменты_after.mp4"
-    },
-    {
-      "name": "Mike",
-      "before": "videos/comparison/Mike_before.mp4",
-      "after": "videos/comparison/Mike_after.mp4"
     }
   ]
 };

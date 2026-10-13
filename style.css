@@ -194,7 +194,7 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
 
 .hero-tagline {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(40px, 7vw, 84px);
+    font-size: clamp(48px, 8vw, 96px); 
     line-height: 1.1;
     letter-spacing: 4px;
     margin-bottom: 32px;
@@ -206,7 +206,13 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     flex-wrap: wrap;
     align-items: center;
     gap: 8px 16px;
-    word-spacing: 0.15em; 
+    word-spacing: 0.15em;
+}
+
+/* ✅ Отдельно для английской версии — еще больше */
+html[lang="en"] .hero-tagline {
+    font-size: clamp(56px, 9vw, 110px); /* ✅ Английский еще крупнее */
+    letter-spacing: 5px;
 }
 .tagline-red {
     color: var(--accent);

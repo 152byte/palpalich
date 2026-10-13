@@ -30,6 +30,7 @@ def scan_category(folder_name):
         return []
 
     priority_files = {
+        'comparison':['Mike_be'],
         'experts': ['Майк', 'Mike', 'mike', 'Метрики', 'Апартаменты', 'Статистика', 'Отопление'],
         'motion': ['Блокчейн', 'Авто'], 
         'vlog': [],
@@ -89,14 +90,36 @@ def scan_comparison():
             files.setdefault(base_name, {})['after'] = file
     
     pairs = []
-    for base_name, pair in sorted(files.items(), reverse=True):
+    for base_name, pair in files.items():
         if 'before' in pair and 'after' in pair:
             pairs.append({
                 'name': base_name.replace('_', ' ').replace('-', ' ').title(),
                 'before': f'videos/comparison/{pair["before"].name}',
                 'after': f'videos/comparison/{pair["after"].name}',
+                'stem': base_name,  # для сортировки
             })
-    return pairs
+    
+    priority_names = ['Mike', 'Майк', 'mike']
+    priority_lower = [p.lower() for p in priority_names]
+    
+    priority_pairs = []
+    other_pairs = []
+    
+    for pair in pairs:
+        if pair['stem'].lower() in priority_lower:
+            priority_pairs.append(pair)
+        else:
+            other_pairs.append(pair)
+
+    priority_pairs.sort(key=lambda p: priority_lower.index(p['stem'].lower()))
+
+    other_pairs.sort(key=lambda p: p['stem'], reverse=True)
+ 
+    result = priority_pairs + other_pairs
+    for p in result:
+        p.pop('stem', None)
+    
+    return result
 
 def main():
     print('🎬 Сканирование папки videos/...')

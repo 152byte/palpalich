@@ -1,13 +1,6 @@
 #!/usr/bin/env python3
 """
 Генерирует videos.js со списком видео по категориям.
-Структура папок:
-    videos/experts/      - экспертные (вертикальные)
-    videos/motion/       - моушн (вертикальные)
-    videos/vlog/         - влоги (горизонтальные)
-    videos/travel/       - путешествия (вертикальные)
-    videos/gaming/       - игровые (горизонтальные)
-    videos/comparison/   - пары "до/после"
 """
 import json
 from pathlib import Path
@@ -38,7 +31,7 @@ def scan_category(folder_name):
 
     priority_files = {
         'experts': ['Майк', 'Mike', 'mike', 'Метрики', 'Апартаменты', 'Статистика', 'Отопление'],
-        'motion': ['Авто', 'Блокчейн'],
+        'motion': ['Блокчейн', 'Авто'], 
         'vlog': [],
         'travel': ['Вьетнам', 'Vietnam', 'vietnam'],
         'gaming': [],
@@ -132,7 +125,6 @@ def main():
     
     print(f'\nВсего видео: {total}')
     print(f'Обновлено: {OUTPUT_FILE}')
-
 
 if __name__ == '__main__':
     main()

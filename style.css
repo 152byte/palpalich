@@ -201,14 +201,22 @@ button { cursor: pointer; border: none; background: none; font-family: inherit; 
     animation: fadeUp 0.8s ease-out;
     text-transform: uppercase;
     max-width: 900px;
+    
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px 16px;
+    word-spacing: 0.15em; 
 }
 .tagline-red {
     color: var(--accent);
     text-shadow: 0 0 30px var(--accent-glow);
     display: inline-block;
-    margin-right: 16px;
 }
-.tagline-white { color: var(--text); display: inline-block; }
+.tagline-white {
+    color: var(--text);
+    display: inline-block;
+}
 
 .hero-subtitle {
     font-size: 18px; color: var(--text-dim); margin-bottom: 40px;

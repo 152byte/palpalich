@@ -15,11 +15,6 @@ const PORTFOLIO_VIDEOS = {
         "filename": "Метрики.mp4"
       },
       {
-        "name": "Аппартаменты",
-        "src": "videos/experts/Аппартаменты.mp4",
-        "filename": "Аппартаменты.mp4"
-      },
-      {
         "name": "Статистика",
         "src": "videos/experts/Статистика.mp4",
         "filename": "Статистика.mp4"
@@ -28,6 +23,11 @@ const PORTFOLIO_VIDEOS = {
         "name": "Отопление",
         "src": "videos/experts/Отопление.mp4",
         "filename": "Отопление.mp4"
+      },
+      {
+        "name": "Аппартаменты",
+        "src": "videos/experts/Аппартаменты.mp4",
+        "filename": "Аппартаменты.mp4"
       }
     ]
   },
@@ -36,14 +36,14 @@ const PORTFOLIO_VIDEOS = {
     "orientation": "vertical",
     "videos": [
       {
-        "name": "Авто",
-        "src": "videos/motion/Авто.mp4",
-        "filename": "Авто.mp4"
-      },
-      {
         "name": "Блокчейн",
         "src": "videos/motion/Блокчейн.mp4",
         "filename": "Блокчейн.mp4"
+      },
+      {
+        "name": "Авто",
+        "src": "videos/motion/Авто.mp4",
+        "filename": "Авто.mp4"
       },
       {
         "name": "Мерс",
@@ -105,6 +105,11 @@ const PORTFOLIO_VIDEOS = {
       "name": "Аппартаменты",
       "before": "videos/comparison/Аппартаменты_before.mov",
       "after": "videos/comparison/Аппартаменты_after.mp4"
+    },
+    {
+      "name": "Mike",
+      "before": "videos/comparison/Mike_before.mp4",
+      "after": "videos/comparison/Mike_after.mp4"
     }
   ]
 };
